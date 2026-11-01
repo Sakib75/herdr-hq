@@ -1,0 +1,38 @@
+id = "sakib75.hq"
+name = "HQ"
+version = "0.1.0"
+min_herdr_version = "0.9.0"
+description = "One agent you talk to in a ctrl+\\ popup. It hands your requests to the agents already working in your tabs."
+platforms = ["macos", "linux"]
+
+# Keeps the tab-bar badge pointed at the current install after updates.
+[[startup]]
+command = ["python3", "bin/hq.py", "startup"]
+
+[[actions]]
+id = "toggle"
+title = "Show or hide HQ"
+contexts = ["global"]
+command = ["python3", "bin/hq.py", "toggle"]
+
+[[actions]]
+id = "stop"
+title = "Stop HQ and its session"
+contexts = ["global"]
+command = ["python3", "bin/hq.py", "stop"]
+
+[[panes]]
+id = "window"
+title = "HQ"
+placement = "popup"
+width = "70%"
+height = "80%"
+command = ["python3", "bin/hq.py", "window"]
+
+[[panes]]
+id = "setup"
+title = "HQ setup"
+placement = "popup"
+width = "80%"
+height = "80%"
+command = ["python3", "bin/hq.py", "setup"]
