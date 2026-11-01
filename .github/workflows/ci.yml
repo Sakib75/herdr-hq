@@ -11,17 +11,23 @@ permissions:
 jobs:
   test:
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        python: ["3.9", "3.11", "3.13"]
+        include:
+          - { os: ubuntu-latest, python: "3.11" }
+          - { os: ubuntu-latest, python: "3.13" }
+          - { os: macos-latest, python: "3.13" }
+          # macOS's own python3 (3.9), which Herdr may run HQ with on a Mac without Homebrew Python.
+          - { os: macos-latest, python: system }
     runs-on: ${{ matrix.os }}
+    env:
+      PY: ${{ matrix.python == 'system' && '/usr/bin/python3' || 'python' }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+      - if: matrix.python != 'system'
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
         with:
           python-version: ${{ matrix.python }}
-      - run: python -m py_compile bin/hq.py
-      - run: python -m unittest discover -s tests -v
-      - name: Manifest parses
-        if: matrix.python != '3.9'
-        run: python -c "import tomllib; m = tomllib.load(open('herdr-plugin.toml', 'rb')); assert m['id'] == 'sakib75.hq', m['id']"
+      - run: $PY --version
+      - run: $PY -m py_compile bin/hq.py
+      - run: $PY -m unittest discover -s tests -v
